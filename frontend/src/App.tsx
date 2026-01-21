@@ -10,6 +10,7 @@ import Signup from "./pages/Signup";
 import Dashboard from "./pages/Dashboard";
 import Analytics from "./pages/Analytics";
 import NotFound from "./pages/NotFound";
+import Home from "./pages/Home"
 
 const queryClient = new QueryClient();
 
@@ -22,7 +23,9 @@ const App = () => (
 
         <Routes>
 
-          <Route path="/" element={<Navigate to="/dashboard" replace />} />
+          {/* <Route path="/" element={<Navigate to="/dashboard" replace />} /> */}
+          <Route path="/" element={<Home />} />
+
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
 
@@ -41,6 +44,7 @@ const App = () => (
               </ProtectedRoute>} />
 
           <Route path="*" element={<NotFound />} />
+
         </Routes>
 
       </TooltipProvider>

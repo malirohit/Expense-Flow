@@ -2,10 +2,10 @@ import React from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
-import { 
-  LayoutDashboard, 
-  PieChart, 
-  LogOut, 
+import {
+  LayoutDashboard,
+  PieChart,
+  LogOut,
   Wallet,
   Menu,
   X
@@ -16,6 +16,12 @@ import { cn } from '@/lib/utils';
 interface LayoutProps {
   children: React.ReactNode;
 }
+
+const publicNavItems = [
+  { href: '/login', label: 'Login' },
+  { href: '/signup', label: 'Sign Up' },
+];
+
 
 export const Layout: React.FC<LayoutProps> = ({ children }) => {
   const { user, logout } = useAuth();
@@ -39,8 +45,11 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
       <header className="sticky top-0 z-50 border-b bg-card/80 backdrop-blur-sm">
         <div className="container mx-auto px-4">
           <div className="flex h-16 items-center justify-between">
+
             {/* Logo */}
-            <Link to="/dashboard" className="flex items-center gap-2">
+            {/* <Link to="/dashboard" className="flex items-center gap-2"> */}
+            <Link to={user ? "/dashboard" : "/"} className="flex items-center gap-2">
+
               <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary">
                 <Wallet className="h-5 w-5 text-primary-foreground" />
               </div>
@@ -49,37 +58,64 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
 
             {/* Desktop Navigation */}
             <nav className="hidden md:flex items-center gap-1">
-              {navItems.map((item) => {
-                const Icon = item.icon;
-                const isActive = location.pathname === item.href;
-                return (
+              {user ? (
+                navItems.map((item) => {
+                  const Icon = item.icon;
+                  const isActive = location.pathname === item.href;
+                  return (
+                    <Link
+                      key={item.href}
+                      to={item.href}
+                      className={cn(
+                        "flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors",
+                        isActive
+                          ? "bg-primary text-primary-foreground"
+                          : "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
+                      )}
+                    >
+                      <Icon className="h-4 w-4" />
+                      {item.label}
+                    </Link>
+                  );
+                })
+              ) : (
+                publicNavItems.map((item) => (
                   <Link
                     key={item.href}
                     to={item.href}
-                    className={cn(
-                      "flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors",
-                      isActive 
-                        ? "bg-primary text-primary-foreground" 
-                        : "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
-                    )}
+                    className="px-4 py-2 rounded-lg text-sm font-medium text-muted-foreground hover:bg-accent hover:text-accent-foreground"
                   >
-                    <Icon className="h-4 w-4" />
-                    {item.label}
+                    {/* {item.label} */}
                   </Link>
-                );
-              })}
+                ))
+              )}
             </nav>
 
             {/* User Section */}
             <div className="hidden md:flex items-center gap-4">
-              <span className="text-sm text-muted-foreground">
-                {user?.name || user?.email}
-              </span>
-              <Button variant="outline" size="sm" onClick={handleLogout}>
-                <LogOut className="h-4 w-4 mr-2" />
-                Logout
-              </Button>
+              {user ? (
+                <>
+                  <span className="text-sm text-muted-foreground">
+                    {user?.name || user?.email}
+                  </span>
+                  <Button variant="outline" size="sm" onClick={handleLogout}>
+                    <LogOut className="h-4 w-4 mr-2" />
+                    Logout
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <Link to="/login">
+                    <Button variant="ghost" size="sm">Login</Button>
+                  </Link>
+                  <Link to="/signup">
+                    <Button size="sm">Sign Up</Button>
+                  </Link>
+                </>
+              )}
             </div>
+
+
 
             {/* Mobile Menu Button */}
             <Button
@@ -107,8 +143,8 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
                     onClick={() => setMobileMenuOpen(false)}
                     className={cn(
                       "flex items-center gap-2 px-4 py-3 rounded-lg text-sm font-medium transition-colors",
-                      isActive 
-                        ? "bg-primary text-primary-foreground" 
+                      isActive
+                        ? "bg-primary text-primary-foreground"
                         : "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
                     )}
                   >
@@ -117,20 +153,25 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
                   </Link>
                 );
               })}
-              <div className="border-t pt-4 mt-4">
-                <div className="px-4 py-2 text-sm text-muted-foreground">
-                  Signed in as {user?.email}
+
+              {user && (
+                <div className="border-t pt-4 mt-4">
+                  <div className="px-4 py-2 text-sm text-muted-foreground">
+                    Signed in as {user?.email}
+                  </div>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="w-full mt-2"
+                    onClick={handleLogout}
+                  >
+                    <LogOut className="h-4 w-4 mr-2" />
+                    Logout
+                  </Button>
                 </div>
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  className="w-full mt-2"
-                  onClick={handleLogout}
-                >
-                  <LogOut className="h-4 w-4 mr-2" />
-                  Logout
-                </Button>
-              </div>
+              )}
+
+
             </div>
           </div>
         )}
